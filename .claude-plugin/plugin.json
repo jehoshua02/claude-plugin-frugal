@@ -1,0 +1,10 @@
+{
+  "name": "frugal",
+  "version": "1.0.0",
+  "description": "Cost efficiency rules for Claude Code — lean responses, smart model selection, subagent delegation",
+  "author": {
+    "name": "jehoshua02"
+  },
+  "repository": "https://github.com/jehoshua02/claude-plugin-frugal",
+  "license": "MIT"
+}
