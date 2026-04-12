@@ -24,4 +24,4 @@ When launching subagents, always pass the `model` parameter explicitly.
 - Delegate tasks to subagents. Return only the essential result to main thread.
 - Main thread orchestrates only — no unnecessary detail accumulation.
 - Document key details and decisions in task files as they come up.
-- If context fills: output a short list of relevant file names, then /clear. Never use /compact.
+- If context fills: use /compact, but compact to a short list of relevant file names only. Re-read files on demand after compaction.

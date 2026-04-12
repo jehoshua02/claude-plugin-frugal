@@ -18,4 +18,4 @@ Injects cost efficiency rules via `CLAUDE.md`:
 - **Terse responses** — no filler, no narration, results only
 - **Model selection** — Haiku for simple tasks, Sonnet for code and analysis, Opus for complex decisions
 - **Subagent delegation** — delegate to subagents with the right model; main thread orchestrates only
-- **Context management** — read only what's needed, document as you go, /clear instead of /compact
+- **Context management** — read only what's needed, document as you go, compact to a list of file names then re-read on demand
