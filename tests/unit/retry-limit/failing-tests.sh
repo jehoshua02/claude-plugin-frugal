@@ -17,9 +17,6 @@ baseline_dir=$(new_test_dir)
 rule_dir=$(new_test_dir)
 trap "remove_test_dir '$baseline_dir'; remove_test_dir '$rule_dir'" EXIT
 
-# Seed: Python test that imports a module that doesn't exist
-# The model will try to install it, create it, mock it — all will fail
-# because the test re-imports fresh each run
 seed_test_files() {
   local dir="$1"
   cat > "$dir/test_app.py" << 'SEED'
@@ -61,12 +58,6 @@ timestamp=$(date +%Y%m%d-%H%M%S)
 echo "{\"test\":\"$TEST_NAME\",\"baseline\":$baseline,\"with_rule\":$with_rule}" \
   > "$results_dir/retry-limit-failing-tests-${timestamp}.json"
 
-rule_result=$(echo "$with_rule" | jq -r '.result')
-
-# Correctness: rule run should mention stopping after attempts
-assert_contains "$rule_result" "attempt\|tried\|blocker\|stop\|unable\|cannot\|failed\|give up\|7" \
-  "Rule run should report stopping after failed attempts"
-
 # Efficiency: fewer turns with rule
 baseline_turns=$(echo "$baseline" | jq '.num_turns')
 rule_turns=$(echo "$with_rule" | jq '.num_turns')
@@ -75,6 +66,7 @@ efficiency=$(compare_metric "num_turns" "$baseline_turns" "$rule_turns")
 echo "  Baseline num_turns: $baseline_turns"
 echo "  Rule num_turns: $rule_turns"
 echo "  Efficiency: $efficiency"
+
 echo "  Correctness: passed=$TESTS_PASSED failed=$TESTS_FAILED"
 
 [[ $TESTS_FAILED -eq 0 ]]

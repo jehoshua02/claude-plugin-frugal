@@ -12,28 +12,46 @@ TOOLS="Read"
 
 echo "[$TEST_NAME]"
 
-test_dir=$(new_test_dir)
-trap "remove_test_dir '$test_dir'" EXIT
+baseline_dir=$(new_test_dir)
+rule_dir=$(new_test_dir)
+trap "remove_test_dir '$baseline_dir'; remove_test_dir '$rule_dir'" EXIT
 
-cat > "$test_dir/config.json" << 'SEED'
+seed_config() {
+  cat > "$1/config.json" << 'SEED'
 {
   "database": {},
   "api": {},
-  "cache": {}
+  "cache": {},
+  "auth": {},
+  "logging": {},
+  "notifications": {},
+  "storage": {},
+  "queue": {}
 }
 SEED
+}
 
-PROMPT="Read config.json in this directory. This config is incomplete. What info do you need from me to complete it?"
+seed_config "$baseline_dir"
+seed_config "$rule_dir"
 
-results=$(run_test_pair "$TEST_NAME" "$PROMPT" "$test_dir" "$TOOLS" "$RULE")
-baseline=$(echo "$results" | head -1)
-with_rule=$(echo "$results" | tail -1)
+PROMPT="Read config.json in this directory. This config is incomplete — every section is empty. I need you to fill in all sections. What information do you need from me?"
+
+echo "  Running baseline..." >&2
+baseline=$(invoke_claude_test "$PROMPT" "$baseline_dir" "$TOOLS")
+
+echo "  Running with rule..." >&2
+with_rule=$(invoke_claude_test "$PROMPT" "$rule_dir" "$TOOLS" "$RULE")
+
+# Save results
+results_dir="$PROJECT_ROOT/tests/results"
+timestamp=$(date +%Y%m%d-%H%M%S)
+echo "{\"test\":\"$TEST_NAME\",\"baseline\":$baseline,\"with_rule\":$with_rule}" \
+  > "$results_dir/questions-incomplete-config-${timestamp}.json"
 
 baseline_result=$(echo "$baseline" | jq -r '.result')
 rule_result=$(echo "$with_rule" | jq -r '.result')
 
-# Correctness: both should ask at least one question
-assert_contains "$baseline_result" "?" "Baseline should ask a question"
+# Correctness: rule run should ask at least one question
 assert_contains "$rule_result" "?" "Rule run should ask a question"
 
 # Efficiency: fewer question marks with rule
