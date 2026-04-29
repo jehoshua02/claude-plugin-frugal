@@ -40,7 +40,6 @@ echo "{\"test\":\"$TEST_NAME\",\"with_rule\":$with_rule}" \
   > "$results_dir/document-decisions-fix-bug-${timestamp}.json"
 
 rule_result=$(echo "$with_rule" | jq -r '.result')
-echo "  Response: ${rule_result:0:200}" >&2
 
 # Correctness: rule run should mention the fix
 assert_contains "$rule_result" "divid\|zero\|bug\|fix" "Rule run should mention the bug fix"
