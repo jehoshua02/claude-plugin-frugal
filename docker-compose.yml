@@ -1,0 +1,8 @@
+services:
+  test:
+    build: .
+    volumes:
+      - ~/.claude:/root/.claude
+      - ~/.claude.json:/root/.claude.json
+      - ./rules:/app/rules
+      - ./tests:/app/tests

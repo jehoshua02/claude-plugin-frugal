@@ -13,19 +13,25 @@ TOOLS="Read,Write"
 
 echo "[$TEST_NAME]"
 
-test_dir=$(new_test_dir)
-trap "remove_test_dir '$test_dir'" EXIT
+baseline_dir=$(new_test_dir)
+rule_dir=$(new_test_dir)
+trap "remove_test_dir '$baseline_dir'; remove_test_dir '$rule_dir'" EXIT
 
-results=$(run_test_pair "$TEST_NAME" "$PROMPT" "$test_dir" "$TOOLS" "$RULE")
-baseline=$(echo "$results" | head -1)
-with_rule=$(echo "$results" | tail -1)
+echo "  Running baseline..." >&2
+baseline=$(invoke_claude_test "$PROMPT" "$baseline_dir" "$TOOLS")
 
-baseline_result=$(echo "$baseline" | jq -r '.result')
-rule_result=$(echo "$with_rule" | jq -r '.result')
+echo "  Running with rule..." >&2
+with_rule=$(invoke_claude_test "$PROMPT" "$rule_dir" "$TOOLS" "$RULE")
 
-# Correctness: both should create the file (check response mentions it)
-assert_contains "$baseline_result" "hello" "Baseline should mention hello"
-assert_contains "$rule_result" "hello" "Rule run should mention hello"
+# Save results
+local_results_dir="$PROJECT_ROOT/tests/results"
+timestamp=$(date +%Y%m%d-%H%M%S)
+echo "{\"test\":\"$TEST_NAME\",\"baseline\":$baseline,\"with_rule\":$with_rule}" \
+  > "$local_results_dir/responses-create-file-${timestamp}.json"
+
+# Correctness: check the file was created
+assert_file_exists "$baseline_dir/hello.txt" "Baseline should create hello.txt"
+assert_file_exists "$rule_dir/hello.txt" "Rule run should create hello.txt"
 
 # Efficiency: fewer output tokens with rule
 baseline_output=$(echo "$baseline" | jq '.output_tokens')

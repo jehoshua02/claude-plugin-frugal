@@ -1,13 +1,9 @@
-FROM ubuntu:24.04
+FROM alpine:3.21
 
-RUN apt-get update && apt-get install -y \
-    bash \
-    bc \
-    curl \
-    jq \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache bash bc curl jq
 
-RUN curl -fsSL https://cli.claude.ai/install.sh | sh
+RUN curl -fsSL https://claude.ai/install.sh | bash
+ENV PATH="/root/.local/bin:${PATH}"
 
 WORKDIR /app
 COPY . .

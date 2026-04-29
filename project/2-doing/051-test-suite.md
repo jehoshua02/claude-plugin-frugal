@@ -15,23 +15,32 @@ Build a test suite that verifies each rule improves efficiency without sacrifici
 
 - Captured: 2026-04-28
 - Refined: 2026-04-29
+- Started: 2026-04-29
 
 ## Details
 
-### Approach
-
-For each rule, define a task. Run the task twice via `claude -p` (CLI headless): once with the rule, once without. Assert both complete correctly. Assert the rule-enabled run is more efficient.
-
-Integration tests: same idea, all rules loaded vs no rules.
-
 ### Decisions
 
-- **Execution:** Claude Code CLI headless (`claude -p`). Tests real agent behavior with tools, hooks, file system.
-- **Metrics:** Track everything easily extractable from CLI — tokens, tool calls, turns, wall time, etc.
-- **Environment:** Temp dirs with seeded files, torn down after each run.
-- **Correctness:** Deterministic assertions on task output (file exists, contains expected content, etc.).
+- **Execution:** `claude -p` headless, no `--bare` (breaks OAuth), no plugins installed in container
+- **Model:** Sonnet for all tests (cost-effective)
+- **Metrics:** JSON output gives total_cost_usd, usage.input_tokens, usage.output_tokens, num_turns
+- **Rules:** Split into individual files in `rules/`. Tests reference directly.
+- **Docker:** Alpine + claude CLI + jq. docker-compose with volume mounts for rules/tests and OAuth creds.
+- **Hook change:** SessionStart + SubagentStart hooks now cat rules to stdout (no file copy).
 
-### Open
+### Current state: 5/8 tests passing
 
-- Metric extraction method from CLI — research needed.
-- Flakiness strategy — multiple runs and average, or acceptable variance threshold.
+Passing: model-selection, no-pdf, questions, read-sections, responses
+
+Failing:
+- **document-decisions/fix-bug** — Assertion too strict ("zero"), shared test dir between runs
+- **retry-limit/failing-tests** — Model recognizes unfixable problem too quickly, doesn't retry 7 times
+- **integration/all-rules** — Didn't ask config question (assertion mismatch)
+
+### Remaining work
+
+- Fix shared test dir bug in document-decisions and integration tests
+- Relax assertions to match actual model behavior
+- Retry test needs a more convincing unfixable scenario
+- Efficiency metrics show no improvement — rules may be too subtle for single-call tests, or system prompt dominates
+- Consider dropping median-of-two strategy (not implemented yet, may not be needed)

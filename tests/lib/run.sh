@@ -1,8 +1,8 @@
 #!/bin/bash
 # Test harness for running claude in headless mode and capturing metrics
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+_RUN_SH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$_RUN_SH_DIR/../.." && pwd)"
 
 invoke_claude_test() {
   local prompt="$1"
@@ -10,14 +10,15 @@ invoke_claude_test() {
   local tools="$3"
   local rules_file="${4:-}"
   local max_turns="${5:-20}"
-  local max_budget="${6:-0.10}"
+  local max_budget="${6:-1.00}"
+  local model="${7:-claude-sonnet-4-6}"
 
   local args=(
-    --bare
     -p "$prompt"
     --output-format json
     --max-turns "$max_turns"
     --max-budget-usd "$max_budget"
+    --model "$model"
     --allowedTools "$tools"
   )
 
@@ -27,8 +28,13 @@ invoke_claude_test() {
 
   local start_time=$SECONDS
   local output
-  output=$(cd "$work_dir" && claude "${args[@]}" 2>/dev/null)
+  output=$(cd "$work_dir" && claude "${args[@]}" 2>/dev/null) || true
   local wall_time=$(( SECONDS - start_time ))
+
+  if ! echo "$output" | jq empty 2>/dev/null; then
+    echo "{\"cost\":0,\"input_tokens\":0,\"output_tokens\":0,\"num_turns\":0,\"wall_time\":$wall_time,\"result\":\"ERROR: invalid JSON output\"}"
+    return 1
+  fi
 
   local cost input_tokens output_tokens num_turns result
   cost=$(echo "$output" | jq -r '.total_cost_usd // 0')
@@ -48,18 +54,19 @@ run_test_pair() {
   local rules_file="$5"
   local max_turns="${6:-20}"
 
-  echo "  Running baseline..."
+  echo "  Running baseline..." >&2
   local baseline
   baseline=$(invoke_claude_test "$prompt" "$work_dir" "$tools" "" "$max_turns")
 
-  echo "  Running with rule..."
+  echo "  Running with rule..." >&2
   local with_rule
   with_rule=$(invoke_claude_test "$prompt" "$work_dir" "$tools" "$rules_file" "$max_turns")
 
   local results_dir="$PROJECT_ROOT/tests/results"
+  local safe_name="${test_name//\//-}"
   local timestamp=$(date +%Y%m%d-%H%M%S)
   echo "{\"test\":\"$test_name\",\"baseline\":$baseline,\"with_rule\":$with_rule}" \
-    > "$results_dir/${test_name}-${timestamp}.json"
+    > "$results_dir/${safe_name}-${timestamp}.json"
 
   echo "$baseline"
   echo "$with_rule"
