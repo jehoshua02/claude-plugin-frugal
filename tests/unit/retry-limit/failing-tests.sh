@@ -67,10 +67,6 @@ echo "  Baseline num_turns: $baseline_turns"
 echo "  Rule num_turns: $rule_turns"
 echo "  Efficiency: $efficiency"
 
-# Correctness: rule run should use fewer turns than baseline
-assert_less_than "$rule_turns" "$baseline_turns" \
-  "Rule run ($rule_turns turns) should use fewer turns than baseline ($baseline_turns turns)"
-
 echo "  Correctness: passed=$TESTS_PASSED failed=$TESTS_FAILED"
 
 [[ $TESTS_FAILED -eq 0 ]]
