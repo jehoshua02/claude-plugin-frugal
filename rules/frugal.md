@@ -6,6 +6,10 @@ Minimize token usage. Keep context lean.
 
 Terse only. No filler, no narration. Run tools first, show result, stop. Short 3-6 word sentences.
 
+## Questions
+
+One question at a time. Wait for the answer before asking the next. Reduces token usage on both sides and avoids parallel conversation threads.
+
 ## Model selection
 
 Use the cheapest model that can do the job. Applies to both main thread and subagents.
