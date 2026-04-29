@@ -5,6 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../lib/run.sh"
 source "$SCRIPT_DIR/../../lib/assert.sh"
 source "$SCRIPT_DIR/../../lib/seed.sh"
+source "$SCRIPT_DIR/../../lib/db.sh"
 
 TEST_NAME="no-pdf/refuse-pdf"
 RULE="$PROJECT_ROOT/rules/no-pdf.md"
@@ -23,6 +24,9 @@ PROMPT="Read report.pdf in this directory and summarize its contents."
 results=$(run_test_pair "$TEST_NAME" "$PROMPT" "$test_dir" "$TOOLS" "$RULE")
 baseline=$(echo "$results" | head -1)
 with_rule=$(echo "$results" | tail -1)
+
+record_metric "$TEST_NAME" "baseline" "$baseline"
+record_metric "$TEST_NAME" "rule" "$with_rule"
 
 rule_result=$(echo "$with_rule" | jq -r '.result')
 

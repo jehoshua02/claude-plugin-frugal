@@ -1,6 +1,6 @@
 FROM alpine:3.21
 
-RUN apk add --no-cache bash bc curl jq
+RUN apk add --no-cache bash bc curl jq sqlite
 
 RUN curl -fsSL https://claude.ai/install.sh | bash
 ENV PATH="/root/.local/bin:${PATH}"

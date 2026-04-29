@@ -5,6 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../lib/run.sh"
 source "$SCRIPT_DIR/../../lib/assert.sh"
 source "$SCRIPT_DIR/../../lib/seed.sh"
+source "$SCRIPT_DIR/../../lib/db.sh"
 
 TEST_NAME="retry-limit/failing-tests"
 RULE="$PROJECT_ROOT/rules/retry-limit.md"
@@ -57,6 +58,9 @@ results_dir="$PROJECT_ROOT/tests/results"
 timestamp=$(date +%Y%m%d-%H%M%S)
 echo "{\"test\":\"$TEST_NAME\",\"baseline\":$baseline,\"with_rule\":$with_rule}" \
   > "$results_dir/retry-limit-failing-tests-${timestamp}.json"
+
+record_metric "$TEST_NAME" "baseline" "$baseline"
+record_metric "$TEST_NAME" "rule" "$with_rule"
 
 # Efficiency: fewer turns with rule
 baseline_turns=$(echo "$baseline" | jq '.num_turns')

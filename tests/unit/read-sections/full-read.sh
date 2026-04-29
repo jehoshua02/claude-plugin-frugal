@@ -5,6 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../lib/run.sh"
 source "$SCRIPT_DIR/../../lib/assert.sh"
 source "$SCRIPT_DIR/../../lib/seed.sh"
+source "$SCRIPT_DIR/../../lib/db.sh"
 
 TEST_NAME="read-sections/full-read"
 RULE="$PROJECT_ROOT/rules/read-sections.md"
@@ -52,6 +53,8 @@ results_dir="$PROJECT_ROOT/tests/results"
 timestamp=$(date +%Y%m%d-%H%M%S)
 echo "{\"test\":\"$TEST_NAME\",\"with_rule\":$with_rule}" \
   > "$results_dir/read-sections-full-read-${timestamp}.json"
+
+record_metric "$TEST_NAME" "rule" "$with_rule"
 
 rule_result=$(echo "$with_rule" | jq -r '.result')
 

@@ -5,3 +5,4 @@ services:
       - ~/.claude/.credentials.json:/root/.claude/.credentials.json:ro
       - ./rules:/app/rules
       - ./tests:/app/tests
+      - ./tests/metrics.db:/app/tests/metrics.db
