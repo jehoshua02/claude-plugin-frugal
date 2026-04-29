@@ -82,7 +82,7 @@ compare_metric() {
 
   if (( $(echo "$rule_val < $baseline_val" | bc -l) )); then
     local delta
-    delta=$(echo "scale=1; ($rule_val - $baseline_val) / $baseline_val * 100" | bc -l)
+    delta=$(echo "scale=1; ($rule_val - $baseline_val) * 100 / $baseline_val" | bc -l)
     echo "PASS|${delta}%"
   else
     echo "WARN|no improvement"
