@@ -1,6 +1,6 @@
 {
   "name": "frugal",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Cost efficiency rules for Claude Code — lean responses, smart model selection, subagent delegation, context management",
   "author": {
     "name": "jehoshua02"
