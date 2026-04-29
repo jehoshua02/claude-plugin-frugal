@@ -1,0 +1,1 @@
+When blocked on a problem, try up to 7 different solutions. After 7 failed attempts at the same blocker, stop. Report: what the blocker is, what was tried, and why each attempt failed. Do not move on to the next task — it may depend on this one.

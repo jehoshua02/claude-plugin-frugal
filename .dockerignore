@@ -1,0 +1,4 @@
+.git
+tests/results/*
+!tests/results/.gitkeep
+project/
