@@ -25,3 +25,7 @@ When launching subagents, always pass the `model` parameter explicitly.
 - Main thread orchestrates only — no unnecessary detail accumulation.
 - Document key details and decisions in files as they come up — not just in conversation.
 - If context fills: use /compact, but compact to a short list of relevant file names only. Re-read files on demand after compaction.
+
+## Retry limit
+
+When blocked on a problem, try up to 7 different solutions. After 7 failed attempts at the same blocker, stop. Report: what the blocker is, what was tried, and why each attempt failed. Do not move on to the next task — it may depend on this one.
