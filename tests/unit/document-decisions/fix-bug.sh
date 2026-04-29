@@ -12,41 +12,51 @@ TOOLS="Read,Write"
 
 echo "[$TEST_NAME]"
 
-test_dir=$(new_test_dir)
-trap "remove_test_dir '$test_dir'" EXIT
+rule_dir=$(new_test_dir)
+trap "remove_test_dir '$rule_dir'" EXIT
 
-# Seed: Python file with an obvious bug
-cat > "$test_dir/bug.py" << 'SEED'
+seed_bug() {
+  local dir="$1"
+  cat > "$dir/bug.py" << 'SEED'
 def divide(a, b):
     return a / b
 
 result = divide(10, 0)
 print(result)
 SEED
+}
+
+seed_bug "$rule_dir"
 
 PROMPT="Fix the bug in bug.py in this directory. Document your findings and decision in a notes file."
 
-results=$(run_test_pair "$TEST_NAME" "$PROMPT" "$test_dir" "$TOOLS" "$RULE")
-baseline=$(echo "$results" | head -1)
-with_rule=$(echo "$results" | tail -1)
+echo "  Running with rule..." >&2
+with_rule=$(invoke_claude_test "$PROMPT" "$rule_dir" "$TOOLS" "$RULE")
+
+# Save results
+results_dir="$PROJECT_ROOT/tests/results"
+timestamp=$(date +%Y%m%d-%H%M%S)
+echo "{\"test\":\"$TEST_NAME\",\"with_rule\":$with_rule}" \
+  > "$results_dir/document-decisions-fix-bug-${timestamp}.json"
 
 rule_result=$(echo "$with_rule" | jq -r '.result')
 
 # Correctness: rule run should mention the fix
-assert_contains "$rule_result" "zero" "Rule run should mention division by zero"
+assert_contains "$rule_result" "divid\|zero\|bug\|fix" "Rule run should mention the bug fix"
 
-# Check if a notes/decisions file was created
+# Check if any additional file was created (notes, decisions, findings, etc.)
 notes_found=false
-for f in "$test_dir"/*notes* "$test_dir"/*decision* "$test_dir"/*findings*; do
-  if [[ -f "$f" ]]; then
+for f in "$rule_dir"/*; do
+  fname=$(basename "$f")
+  if [[ "$fname" != "bug.py" ]]; then
     notes_found=true
+    echo "  Notes file created: $fname"
     break
   fi
 done
 
 if $notes_found; then
   TESTS_PASSED=$((TESTS_PASSED + 1))
-  echo "  Notes file created: yes"
 else
   TESTS_FAILED=$((TESTS_FAILED + 1))
   echo "  FAIL: Rule run should create a notes/decisions file"

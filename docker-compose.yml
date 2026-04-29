@@ -2,7 +2,6 @@ services:
   test:
     build: .
     volumes:
-      - ~/.claude:/root/.claude
-      - ~/.claude.json:/root/.claude.json
+      - ~/.claude/.credentials.json:/root/.claude/.credentials.json:ro
       - ./rules:/app/rules
       - ./tests:/app/tests

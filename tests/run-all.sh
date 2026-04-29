@@ -22,19 +22,26 @@ run_test() {
   echo ""
 }
 
+FILTER="${1:-}"
+
+matches_filter() {
+  [[ -z "$FILTER" ]] && return 0
+  [[ "$1" == *"$FILTER"* ]]
+}
+
 echo "=== Frugal Plugin Test Suite ==="
 echo ""
 
 # Unit tests
 for test_dir in "$SCRIPT_DIR"/unit/*/; do
   for test_script in "$test_dir"*.sh; do
-    [[ -f "$test_script" ]] && run_test "$test_script"
+    [[ -f "$test_script" ]] && matches_filter "$test_script" && run_test "$test_script"
   done
 done
 
 # Integration tests
 for test_script in "$SCRIPT_DIR"/integration/*.sh; do
-  [[ -f "$test_script" ]] && run_test "$test_script"
+  [[ -f "$test_script" ]] && matches_filter "$test_script" && run_test "$test_script"
 done
 
 echo "=== Summary ==="

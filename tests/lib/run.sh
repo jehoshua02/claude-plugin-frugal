@@ -36,14 +36,17 @@ invoke_claude_test() {
     return 1
   fi
 
-  local cost input_tokens output_tokens num_turns result
+  local cost input_tokens cache_creation cache_read total_input output_tokens num_turns result
   cost=$(echo "$output" | jq -r '.total_cost_usd // 0')
   input_tokens=$(echo "$output" | jq -r '.usage.input_tokens // 0')
+  cache_creation=$(echo "$output" | jq -r '.usage.cache_creation_input_tokens // 0')
+  cache_read=$(echo "$output" | jq -r '.usage.cache_read_input_tokens // 0')
+  total_input=$(echo "$input_tokens + $cache_creation + $cache_read" | bc)
   output_tokens=$(echo "$output" | jq -r '.usage.output_tokens // 0')
   num_turns=$(echo "$output" | jq -r '.num_turns // 0')
   result=$(echo "$output" | jq -r '.result // ""')
 
-  echo "{\"cost\":$cost,\"input_tokens\":$input_tokens,\"output_tokens\":$output_tokens,\"num_turns\":$num_turns,\"wall_time\":$wall_time,\"result\":$(echo "$result" | jq -Rs .)}"
+  echo "{\"cost\":$cost,\"input_tokens\":$input_tokens,\"cache_creation\":$cache_creation,\"cache_read\":$cache_read,\"total_input\":$total_input,\"output_tokens\":$output_tokens,\"num_turns\":$num_turns,\"wall_time\":$wall_time,\"result\":$(echo "$result" | jq -Rs .)}"
 }
 
 run_test_pair() {
