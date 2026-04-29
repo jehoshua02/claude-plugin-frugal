@@ -81,5 +81,5 @@ assert_less_than() {
 count_occurrences() {
   local haystack="$1"
   local pattern="$2"
-  echo "$haystack" | grep -o "$pattern" | wc -l
+  echo "$haystack" | { grep -o "$pattern" || true; } | wc -l
 }
