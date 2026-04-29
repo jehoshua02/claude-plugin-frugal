@@ -6,9 +6,9 @@ source "$SCRIPT_DIR/../../lib/run.sh"
 source "$SCRIPT_DIR/../../lib/assert.sh"
 source "$SCRIPT_DIR/../../lib/seed.sh"
 
-TEST_NAME="document-decisions/fix-bug"
-RULE="$PROJECT_ROOT/rules/document-decisions.md"
-TOOLS="Read,Write"
+TEST_NAME="persist-progress/fix-bug"
+RULE="$PROJECT_ROOT/rules/persist-progress.md"
+TOOLS="Read,Edit,Write"
 
 echo "[$TEST_NAME]"
 
@@ -40,6 +40,7 @@ echo "{\"test\":\"$TEST_NAME\",\"with_rule\":$with_rule}" \
   > "$results_dir/document-decisions-fix-bug-${timestamp}.json"
 
 rule_result=$(echo "$with_rule" | jq -r '.result')
+echo "  Response: ${rule_result:0:200}" >&2
 
 # Correctness: rule run should mention the fix
 assert_contains "$rule_result" "divid\|zero\|bug\|fix" "Rule run should mention the bug fix"
