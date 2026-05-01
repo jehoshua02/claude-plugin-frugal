@@ -15,6 +15,7 @@ Replace file-copy hook with SessionStart + SubagentStart hooks that cat rules to
 
 - Captured: 2026-04-29
 - Refined: 2026-04-29
+- Done: 2026-05-01
 
 ## Details
 
@@ -28,7 +29,6 @@ Use SessionStart + SubagentStart hooks to cat rules to stdout instead of copying
 2. **Copy files to ~/.claude/rules/** (current) — Proven but creates orphaned files. Messy uninstall.
 3. **@import in CLAUDE.md** (rejected) — Modifies user files, stale reference persists after uninstall.
 
-### Risks to verify
+## Closed
 
-- SubagentStart stdout injection works same as SessionStart
-- Rules fit within 10k character cap
+Already implemented. hooks.json has both SessionStart and SubagentStart hooks using `cat rules/*.md`.
