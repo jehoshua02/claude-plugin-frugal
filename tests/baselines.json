@@ -1,0 +1,11 @@
+{
+  "model-selection/simple-task":      { "ceiling": 0.08 },
+  "no-pdf/refuse-pdf":               { "ceiling": 0.08 },
+  "output-redirect/verbose-command":  { "ceiling": 0.20 },
+  "questions/incomplete-config":      { "ceiling": 0.10 },
+  "retry-limit/failing-tests":       { "ceiling": 0.25 },
+  "responses/create-file":           { "ceiling": 0.09 },
+  "read-sections/search":            { "ceiling": 0.15 },
+  "read-sections/full-read":         { "ceiling": 0.13 },
+  "persist-progress/fix-bug":        { "ceiling": 0.16 }
+}

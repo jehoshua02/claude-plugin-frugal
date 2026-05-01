@@ -34,6 +34,9 @@ echo "{\"test\":\"$TEST_NAME\",\"baseline\":$baseline,\"with_rule\":$with_rule}"
 record_metric "$TEST_NAME" "baseline" "$baseline"
 record_metric "$TEST_NAME" "rule" "$with_rule"
 
+rule_cost=$(echo "$with_rule" | jq '.cost')
+assert_within_baseline "$TEST_NAME" "$rule_cost"
+
 baseline_result=$(echo "$baseline" | jq -r '.result')
 rule_result=$(echo "$with_rule" | jq -r '.result')
 

@@ -1,6 +1,7 @@
 #!/bin/bash
 # Assertion helpers for test suite
 
+_ASSERT_SH_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TESTS_PASSED=0
 TESTS_FAILED=0
 
@@ -76,6 +77,21 @@ assert_less_than() {
     echo "  FAIL: $msg"
     return 1
   fi
+}
+
+assert_within_baseline() {
+  local test_name="$1"
+  local actual_cost="$2"
+  local baselines_file="$_ASSERT_SH_DIR/../baselines.json"
+  local ceiling
+  ceiling=$(jq -r --arg t "$test_name" '.[$t].ceiling // empty' "$baselines_file")
+
+  if [[ -z "$ceiling" ]]; then
+    echo "  WARN: no baseline for $test_name"
+    return 0
+  fi
+
+  assert_less_than "$actual_cost" "$ceiling" "Cost $actual_cost exceeds ceiling $ceiling for $test_name"
 }
 
 count_occurrences() {

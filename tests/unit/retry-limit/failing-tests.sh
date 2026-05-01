@@ -62,6 +62,9 @@ echo "{\"test\":\"$TEST_NAME\",\"baseline\":$baseline,\"with_rule\":$with_rule}"
 record_metric "$TEST_NAME" "baseline" "$baseline"
 record_metric "$TEST_NAME" "rule" "$with_rule"
 
+rule_cost=$(echo "$with_rule" | jq '.cost')
+assert_within_baseline "$TEST_NAME" "$rule_cost"
+
 # Efficiency: fewer turns with rule
 baseline_turns=$(echo "$baseline" | jq '.num_turns')
 rule_turns=$(echo "$with_rule" | jq '.num_turns')

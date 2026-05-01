@@ -25,6 +25,9 @@ with_rule=$(echo "$results" | tail -1)
 record_metric "$TEST_NAME" "baseline" "$baseline"
 record_metric "$TEST_NAME" "rule" "$with_rule"
 
+rule_cost=$(echo "$with_rule" | jq -r '.cost')
+assert_within_baseline "$TEST_NAME" "$rule_cost"
+
 rule_result=$(echo "$with_rule" | jq -r '.result')
 
 # Correctness: rule-enabled should recommend haiku

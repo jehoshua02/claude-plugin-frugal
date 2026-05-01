@@ -56,6 +56,9 @@ echo "{\"test\":\"$TEST_NAME\",\"with_rule\":$with_rule}" \
 
 record_metric "$TEST_NAME" "rule" "$with_rule"
 
+rule_cost=$(echo "$with_rule" | jq '.cost')
+assert_within_baseline "$TEST_NAME" "$rule_cost"
+
 rule_result=$(echo "$with_rule" | jq -r '.result')
 
 # Correctness: should mention key methods (proves it read the whole file)
