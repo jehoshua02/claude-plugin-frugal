@@ -1,0 +1,1 @@
+Always redirect command output to a file (cmd > output.log 2>&1) unless you are certain the output is short (under 20 lines). Check the return code, then grep the output file for errors, warnings, or relevant sections. Use Read with offset/limit around matches. Do not let raw command output flood the context.
